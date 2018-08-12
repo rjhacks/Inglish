@@ -9,21 +9,20 @@ import (
 )
 
 var (
-	engToIpaDict map[string]string
+	engToIPADict map[string]string
 
 	regNonAlphaNumeric *regexp.Regexp
-	regUselessIpa      *regexp.Regexp
+	regUselessIPA      *regexp.Regexp
 
 	// Replaces Kirschenbaum IPA phrases with Inglish phrases.
 	// Longer IPA phrases come first, to ensure we always replace the longest
 	// possible phrases. The Replacer ensures no overlapping replaces.
 	ipaToIngReplacer = strings.NewReplacer(
+		// Consonants
 		"tS", "tsj",
 		"dZ", "dj",
 		"Ng", "ng",
-		"&", "a", // Kirschenbaum calls this: "near-open front unrounded vowel". The "a" in "dad".
 		"D", "th",
-		"I", "i",
 		"N", "ng",
 		"R", "r",
 		"S", "sh",
@@ -31,6 +30,20 @@ var (
 		"Z", "sj",
 		"j", "y",
 		"w", "wh",
+
+		// Vowels
+		"@U", "ow",
+		"eI", "ay",
+		"&", "a", // Kirschenbaum calls this: "near-open front unrounded vowel". The "a" in "dad".
+		"A", "ah",
+		"@", "aa",
+		"0", "o",
+		"O", "oh",
+		"I", "i",
+		"3", "ur",
+		"V", "uh",
+		"U", "u",
+		"u", "oo",
 	)
 )
 
@@ -38,7 +51,7 @@ var (
 // The given dictionary must render its IPA in Kirschenbaum ASCII format.
 func LoadDict(filePath string) {
 
-	engToIpaDict = make(map[string]string)
+	engToIPADict = make(map[string]string)
 
 	dictfile, err := os.Open(filePath)
 	if err != nil {
@@ -49,7 +62,7 @@ func LoadDict(filePath string) {
 	scanner := bufio.NewScanner(dictfile)
 	for scanner.Scan() {
 		wordDef := strings.Split(scanner.Text(), ";")
-		engToIpaDict[wordDef[0]] = wordDef[1]
+		engToIPADict[wordDef[0]] = wordDef[1]
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -76,14 +89,14 @@ func sanitizeEng(word string, decapitalize bool) string {
 	return word
 }
 
-func EngToIpa(engText string) []string {
+func EngToIPA(engText string) []string {
 	engWords := strings.Split(engText, " ")
 	ipaWords := make([]string, len(engWords))
 	for i, engWord := range engWords {
-		ipaWord, found := engToIpaDict[sanitizeEng(engWord, true)]
+		ipaWord, found := engToIPADict[sanitizeEng(engWord, true)]
 		if !found {
 			// Try again, but leaving capitalization intact.
-			ipaWord, found = engToIpaDict[sanitizeEng(engWord, false)]
+			ipaWord, found = engToIPADict[sanitizeEng(engWord, false)]
 		}
 		if !found {
 			// Give up, leave this word in English, but quote it to show the failure.
@@ -97,25 +110,25 @@ func EngToIpa(engText string) []string {
 	return ipaWords
 }
 
-func sanitizeIpa(word string) string {
-	// Remove all useless Ipa markings.
-	if regUselessIpa == nil {
+func sanitizeIPA(word string) string {
+	// Remove all useless IPA markings.
+	if regUselessIPA == nil {
 		var err error
-		// Useless-to-us Ipa includes:
+		// Useless-to-us IPA includes:
 		// - "'", denotes "primary stress"
-		regUselessIpa, err = regexp.Compile("[']")
+		regUselessIPA, err = regexp.Compile("[']")
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	word = regUselessIpa.ReplaceAllString(word, "")
+	word = regUselessIPA.ReplaceAllString(word, "")
 	return word
 }
 
-func IpaToIng(ipaWords []string) []string {
+func IPAToIng(ipaWords []string) []string {
 	ingWords := make([]string, len(ipaWords))
 	for i, ipaWord := range ipaWords {
-		word := sanitizeIpa(ipaWord)
+		word := sanitizeIPA(ipaWord)
 		word = ipaToIngReplacer.Replace(word)
 		ingWords[i] = word
 	}
