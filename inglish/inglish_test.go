@@ -2,6 +2,7 @@ package inglish
 
 import (
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -25,43 +26,54 @@ func hasMiddle(s string) string {
 	return ".+" + s + ".+"
 }
 
+type testCase struct {
+	in, out string
+}
+
+func assertMatches(t *testing.T, tc testCase) {
+	r := tc.out
+	if !strings.HasPrefix(r, "^") {
+		r = "^" + r
+	}
+	if !strings.HasSuffix(r, "$") {
+		r = r + "$"
+	}
+	assert.Regexp(t, regexp.MustCompile(r), engToIng(tc.in), "For input: "+tc.in)
+}
+
 func TestFunExamples(t *testing.T) {
-	for _, tt := range []struct {
-		in, out string
-	}{
+	for _, tc := range []testCase{
 		{"do", "doo"},
 		{"daddy", "dadi"},
-		//{"odd", "od"},
-		//{"chair", "tsjair"},
-		//{"nature", "natsjur"},
-		//{"teach", "teatsj"},
+		{"odd", "od"},
+		{"chair", "tsjeaar"},
+		{"nature", "naytsjaar"},
+		{"teach", "titsj"},
 		{"gin", "djin"},
 		{"edge", "edj"},
-		//{"queen", "kween"},
-		//{"enough", "enuf"},
-		//{"off", "of"},
-		//{"photo", "foto"},
-		//{"of", "ov"},
+		{"queen", "kwhin"},
+		{"enough", "inuhf"},
+		{"off", "of"},
+		{"photo", "fowtow"},
+		{"of", "ov"},
 		{"city", "siti"},
-		//{"pass", "pas"},
-		//{"rose", "roz"},
-		//{"session", "seshion"},
-		//{"emotion", "emoshion"},
-		//{"genre", "sjenre"},
-		//{"pleasure", "pleasjur"},
-		//{"equation", "equasjn"},
+		{"pass", "pahs"},
+		{"rose", "rowz"},
+		{"session", "seshn"},
+		{"emotion", "imowshn"},
+		{"genre", "sjahnraa"},
+		{"pleasure", "plesjaar"},
+		{"equation", "ikwhaysjn"},
 		{"drink", "dringk"},
 		{"bell", "bel"},
-		//{"chocolate", "tsjoklet"},
+		{"chocolate", "tsjoklaat"},
 	} {
-		assert.Regexp(t, tt.out, engToIng(tt.in), "For input: "+tt.in)
+		assertMatches(t, tc)
 	}
 }
 
 func TestConsonants(t *testing.T) {
-	for _, tt := range []struct {
-		in, out string
-	}{
+	for _, tc := range []testCase{
 		// p
 		{"pen", startsWith("p")},
 		{"spin", hasMiddle("p")},
@@ -74,7 +86,7 @@ func TestConsonants(t *testing.T) {
 		{"sting", startsWith(".t")},
 		{"bet", endsWith("t")},
 		// d
-		{"do", "d."},
+		{"do", startsWith("d")},
 		{"daddy", "d.d."},
 		{"odd", ".d"},
 		// tsj
@@ -93,7 +105,7 @@ func TestConsonants(t *testing.T) {
 		{"unique", endsWith("k")},
 		{"thick", endsWith("k")},
 		// g
-		{"go", "g."},
+		{"go", startsWith("g")},
 		{"get", startsWith("g")},
 		{"beg", endsWith("g")},
 		// f
@@ -115,7 +127,7 @@ func TestConsonants(t *testing.T) {
 		// s
 		{"see", startsWith("s")},
 		{"city", startsWith("s")},
-		{"pass", "..s"},
+		{"pass", endsWith("s")},
 		// z
 		{"zoo", startsWith("z")},
 		{"rose", endsWith("z")},
@@ -155,20 +167,18 @@ func TestConsonants(t *testing.T) {
 		{"very", hasMiddle("r")},
 		{"probably", startsWith(".r")},
 		// w
-		{"we", "w."},
+		{"we", startsWith("w")},
 		{"queen", startsWith(".w")},
 		// y
 		{"yes", startsWith("y")},
 		// wh
 		{"what", startsWith("wh")},
 	} {
-		assert.Regexp(t, tt.out, engToIng(tt.in), "For input: "+tt.in)
+		assertMatches(t, tc)
 	}
 }
 func TestVowels(t *testing.T) {
-	for _, tt := range []struct {
-		in, out string
-	}{
+	for _, tc := range []testCase{
 		// a
 		{"lad", "lad"},
 		{"bad", "bad"},
@@ -178,10 +188,35 @@ func TestVowels(t *testing.T) {
 		{"path", "pahth"},
 		{"sample", "sahmpl"},
 		{"palm", "pahm"},
-		{"father", "fahth.."},
+		{"father", startsWith("fah")},
+		{"start", "staht"},
+		{"arm", "ahm"},
+		// ahr
+		{"car", "kahr"},
 		// aa
 		{"coma", endsWith("aa")},
 		{"about", startsWith("aab")},
+		// aar
+		{"winner", "whinaar"},
+		{"letter", "letaar"},
+		{"donor", endsWith("aar")},
+		{"massacre", endsWith("aar")},
+		// iaar
+		{"near", "niaar"},
+		{"deer", "diaar"},
+		{"here", "hiaar"},
+		// eaar
+		{"square", "skwheaar"},
+		{"mare", "meaar"},
+		{"there", "theaar"},
+		{"bear", "beaar"},
+		// uaar
+		{"cure", "kyuaar"},
+		{"tour", "tuaar"},
+		{"moor", "muaar"},
+		// yuaar
+		{"pure", "pyuaar"},
+		// {"Europe", "Yuaarope"},  // TODO: enable when capitalization works.
 		// o
 		{"lot", "lot"},
 		{"not", "not"},
@@ -199,6 +234,14 @@ func TestVowels(t *testing.T) {
 		{"all", "ohl"},
 		{"halt", "hohlt"},
 		{"talk", "tohk"},
+		{"north", "nohth"},
+		{"force", "fohs"},
+		{"sort", "soht"},
+		{"warm", "whohm"},
+		{"port", "poht"},
+		// ohr
+		{"tore", "tohr"},
+		{"boar", "bohr"},
 		// i
 		{"kit", "kit"},
 		{"sit", "sit"},
@@ -224,11 +267,6 @@ func TestVowels(t *testing.T) {
 		{"bird", "burd"},
 		{"herd", "hurd"},
 		{"earth", "urth"},
-		// ar
-		{"letter", "letaa"},
-		{"winner", "whinaa"},
-		{"donor", endsWith("aar")},
-		{"massacre", endsWith("aar")},
 		// uh
 		{"strut", "struht"},
 		{"run", "ruhn"},
@@ -272,12 +310,20 @@ func TestVowels(t *testing.T) {
 		{"cold", "kowld"},
 		// au
 		{"mouth", "mauth"},
-		{"about", "abaut"},
+		{"about", "aabaut"},
 		{"house", "hauz"},
 		{"now", "nau"},
 		{"trout", "traut"},
 	} {
-		assert.Regexp(t, tt.out, engToIng(tt.in), "For input: "+tt.in)
+		assertMatches(t, tc)
+	}
+}
+
+func TestWordsWithFunnyCharacters(t *testing.T) {
+	for _, tc := range []testCase{
+		{"pronunciation", "praanuhnsiayshn"},
+	} {
+		assertMatches(t, tc)
 	}
 }
 

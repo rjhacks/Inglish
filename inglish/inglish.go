@@ -116,7 +116,9 @@ func sanitizeIPA(word string) string {
 		var err error
 		// Useless-to-us IPA includes:
 		// - "'", denotes "primary stress"
-		regUselessIPA, err = regexp.Compile("[']")
+		// - ".", denotes an open-back rounded vowel.
+		// - "\", denotes an alveolar approximant.
+		regUselessIPA, err = regexp.Compile("['.\\\\]")
 		if err != nil {
 			log.Fatal(err)
 		}
