@@ -67,6 +67,7 @@ func TestFunExamples(t *testing.T) {
 		{"drink", "dringk"},
 		{"bell", "bel"},
 		{"chocolate", "tsjoklaat"},
+		{"football", "futbohl"},
 	} {
 		assertMatches(t, tc)
 	}
@@ -272,7 +273,7 @@ func TestVowels(t *testing.T) {
 		{"run", "ruhn"},
 		{"won", "whuhn"},
 		{"flood", "fluhd"},
-		{"put", "puht"}, // Note: homonym, spoken both "puht" and "put".
+		{"put", "put"}, // Note: homonym, spoken both "puht" and "put".
 		// u
 		{"hood", "hud"},
 		{"foot", "fut"},
@@ -311,7 +312,7 @@ func TestVowels(t *testing.T) {
 		// au
 		{"mouth", "mauth"},
 		{"about", "aabaut"},
-		{"house", "hauz"},
+		{"house", "haus"},
 		{"now", "nau"},
 		{"trout", "traut"},
 	} {
@@ -322,6 +323,19 @@ func TestVowels(t *testing.T) {
 func TestWordsWithFunnyCharacters(t *testing.T) {
 	for _, tc := range []testCase{
 		{"pronunciation", "praanuhnsiayshn"},
+	} {
+		assertMatches(t, tc)
+	}
+}
+
+func TestHomonyms(t *testing.T) {
+	// Prefer more common versions of homonyms.
+	for _, tc := range []testCase{
+		{"am", "am"},      // Alternative: ayem
+		{"do", "doo"},     // Alternative: doo
+		{"put", "put"},    // Alternative: puht
+		{"no", "now"},     // Alternative: nuhmbaar
+		{"house", "haus"}, // Alternative: houz (the verb)
 	} {
 		assertMatches(t, tc)
 	}

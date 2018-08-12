@@ -62,7 +62,13 @@ func LoadDict(filePath string) {
 	scanner := bufio.NewScanner(dictfile)
 	for scanner.Scan() {
 		wordDef := strings.Split(scanner.Text(), ";")
-		engToIPADict[wordDef[0]] = wordDef[1]
+		engWord := wordDef[0]
+		ipaWord := wordDef[1]
+		// In case of homonyms, the dictionary tends to have the most common
+		// definition first. Prefer first definitions.
+		if _, hasDef := engToIPADict[engWord]; !hasDef {
+			engToIPADict[engWord] = ipaWord
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
